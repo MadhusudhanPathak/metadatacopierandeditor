@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Copy and edit photo and video metadata, offline."
 authors = ["Metadata Copier and Editor contributors"]
 license = "GPL-3.0-or-later"
+repository = "https://github.com/MadhusudhanPathak/metadatacopierandeditor"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
