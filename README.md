@@ -1,10 +1,10 @@
 # Metadata Copier and Editor
 
 Compressed or converted your photos and videos, and lost the dates, places and camera details?
-This app puts them back — offline, with a friendly preview and a real Undo.
+This app puts them back, offline, with a friendly preview and a real Undo.
 
-- **Copy Metadata:** pairs each original (Source) with its compressed or converted copy (Converted), copies *all* meaningful metadata across, then swaps the files: the Converted file takes the original's name and folder, and the original is kept next to it as `name_original`.
-- **Edit Metadata:** fix the date (set it, or shift a whole batch when a camera clock was wrong), add a location (type, paste, or search and pick on a map), title, description, keywords, rating, author and copyright — for one file or many at once. Only the fields you touch are written, and each edited file keeps its untouched version next to it as `name_original`.
+- **Copy Metadata:** pairs each original (Source) wiSth its compressed or converted copy (Converted), copies *all* meaningful metadata across, then swaps the files: the Converted file takes the original's name and folder, and the original is kept next to it as `name_original`.
+- **Edit Metadata:** fix the date (set it, or shift a whole batch when a camera clock was wrong), add a location (type, paste, or search and pick on a map), title, description, keywords, rating, author and copyright, for one file or many at once. Only the fields you touch are written, and each edited file keeps its untouched version next to it as `name_original`.
 
 Powered by [ExifTool](https://exiftool.org/), so it works with practically every photo, video and RAW format.
 
@@ -30,7 +30,7 @@ Android is planned next; see [DECISIONS.md](DECISIONS.md#android-status).
 3. **Preview**: see every rename, a before/after of the key fields, and what will be copied. Untick a category to leave that part of the converted file exactly as it is. Nothing changes until you press **Apply**.
 4. **Run** and **Done**: each file is finished or put back as it was. Then **Undo this batch** if you change your mind.
 
-Example — iPhone photos and videos converted to JPEG and MP4 in a `converted` subfolder:
+Example, iPhone photos and videos converted to JPEG and MP4 in a `converted` subfolder:
 
 ```text
 Before                                   After Apply
