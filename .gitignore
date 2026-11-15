@@ -1,24 +1,43 @@
-# Logs
-logs
+# Dependencies and build output (all reproducible: `npm ci`, `npm run build:exe`)
+node_modules/
+dist/
+dist-ssr/
+src-tauri/target/
+src-tauri/gen/
+*.tsbuildinfo
+
+# Pinned ExifTool downloads (re-fetched and hash-checked by `npm run fetch-engine`)
+engine/cache/
+
+# Generated test media (`npm run fixtures`)
+src-tauri/tests/fixtures/
+
+# Release binaries: upload them to GitHub Releases, don't commit them.
+# releases/RELEASE_NOTES.md stays tracked.
+releases/*
+!releases/RELEASE_NOTES.md
+
+# Logs, environment and local files
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
 *.local
+.env
+.env.*
 
-# Editor directories and files
+# Editors and tools
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
+*.iml
+.vs/
+.fleet/
+.claude/
 *.suo
-*.ntvs*
-*.njsproj
-*.sln
 *.sw?
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/

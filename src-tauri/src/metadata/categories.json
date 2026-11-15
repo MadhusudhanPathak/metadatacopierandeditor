@@ -1,0 +1,108 @@
+{
+  "_comment": "Category-to-tag map for the Copy checklist (spec 5.1). Rules are checked top to bottom; the first match wins. Tag names are case-insensitive. 'prefixes'/'suffixes' match the tag name; 'groups0'/'groups1' match ExifTool family-0/1 groups.",
+  "structural": {
+    "_comment": "Describe the file's actual pixels/streams. Never copied from the Source and never cleared from the Converted file (spec 5.1, D6).",
+    "groups0": ["File", "System", "Composite", "ExifTool", "ICC_Profile", "JFIF", "Adobe", "MPF", "PrintIM", "Trailer"],
+    "tags": [
+      "ImageWidth", "ImageHeight", "ImageLength", "ExifImageWidth", "ExifImageHeight", "PixelXDimension", "PixelYDimension",
+      "BitsPerSample", "Compression", "PhotometricInterpretation", "SamplesPerPixel", "PlanarConfiguration",
+      "YCbCrSubSampling", "YCbCrPositioning", "YCbCrCoefficients", "ReferenceBlackWhite", "ColorSpace", "Gamma",
+      "StripOffsets", "StripByteCounts", "RowsPerStrip", "TileWidth", "TileLength", "TileOffsets", "TileByteCounts",
+      "ThumbnailImage", "ThumbnailOffset", "ThumbnailLength", "ThumbnailTIFF", "PreviewImage", "PreviewImageStart",
+      "PreviewImageLength", "JpgFromRaw", "JpgFromRawStart", "JpgFromRawLength", "OtherImage", "OtherImageStart",
+      "OtherImageLength", "ComponentsConfiguration", "CompressedBitsPerPixel", "SubfileType", "OldSubfileType",
+      "Orientation", "Rotation", "MatrixStructure", "Duration", "MediaDuration", "TrackDuration", "TimeScale",
+      "MediaTimeScale", "PreferredRate", "PreferredVolume", "GraphicsMode", "OpColor", "Balance", "AudioFormat",
+      "AudioChannels", "AudioBitsPerSample", "AudioSampleRate", "CompressorID", "CompressorName", "BitDepth",
+      "VideoFrameRate", "SourceImageWidth", "SourceImageHeight", "TrackHeaderVersion", "TrackID", "TrackLayer",
+      "TrackVolume", "MovieHeaderVersion", "NextTrackID", "PosterTime", "SelectionTime", "SelectionDuration",
+      "CurrentTime", "PreviewTime", "PreviewDuration", "MediaHeaderVersion", "HandlerType", "HandlerClass",
+      "HandlerVendorID", "HandlerDescription", "AvgBitrate", "MaxBitrate", "MajorBrand", "MinorVersion",
+      "CompatibleBrands", "ImageSize", "Megapixels", "PrimaryItemReference", "HEVCConfigurationVersion",
+      "ColorProfiles", "ColorPrimaries", "TransferCharacteristics", "MatrixCoefficients", "VideoFullRangeFlag",
+      "ImageSpatialExtent", "ImagePixelDepth", "AuxiliaryType", "MediaDataSize", "MediaDataOffset", "XMPToolkit"
+    ]
+  },
+  "categories": [
+    {
+      "id": "dates",
+      "tags": [
+        "DateTimeOriginal", "CreateDate", "ModifyDate", "DateTimeDigitized", "DateCreated", "DateTimeCreated",
+        "DigitalCreationDate", "DigitalCreationTime", "TimeCreated", "MetadataDate", "CreationDate",
+        "TrackCreateDate", "TrackModifyDate", "MediaCreateDate", "MediaModifyDate", "ContentCreateDate",
+        "DateTime", "DateAcquired", "TimeZoneOffset", "ReleaseDate", "Year", "SonyDateTime", "DateStamp"
+      ],
+      "prefixes": ["OffsetTime", "SubSecTime", "SubSecCreate", "SubSecModify", "SubSecDateTime"],
+      "suffixes": ["DateTimeOriginal"],
+      "exceptPrefixes": ["GPS"]
+    },
+    {
+      "id": "location",
+      "groups1": ["GPS"],
+      "prefixes": ["GPS", "LocationCreated", "LocationShown"],
+      "tags": [
+        "Location", "City", "State", "Country", "Province-State", "Sub-location", "CountryCode",
+        "Country-PrimaryLocationName", "Country-PrimaryLocationCode", "LocationName", "LocationInformation",
+        "GPSCoordinates", "LocationBody", "LocationNote", "LocationRole"
+      ]
+    },
+    {
+      "id": "camera",
+      "tags": [
+        "Make", "Model", "LensModel", "LensMake", "LensInfo", "Lens", "LensSerialNumber", "LensSpecification",
+        "SerialNumber", "BodySerialNumber", "CameraSerialNumber", "InternalSerialNumber", "OwnerName",
+        "CameraOwnerName", "UniqueCameraModel", "LocalizedCameraModel", "Software", "HostComputer",
+        "AndroidMake", "AndroidModel", "AndroidVersion", "CameraModelName", "LensID", "FirmwareVersion",
+        "ProcessingSoftware", "CameraLabel", "ImageUniqueID", "CameraMake", "CameraModel"
+      ]
+    },
+    {
+      "id": "exposure",
+      "tags": [
+        "ExposureTime", "FNumber", "ISO", "ISOSpeed", "ISOSpeedLatitudeyyy", "ISOSpeedLatitudezzz",
+        "RecommendedExposureIndex", "StandardOutputSensitivity", "SensitivityType", "ExposureProgram",
+        "ExposureCompensation", "ExposureMode", "ExposureIndex", "MeteringMode", "LightSource", "Flash",
+        "FlashEnergy", "FocalLength", "FocalLengthIn35mmFormat", "FocalPlaneXResolution", "FocalPlaneYResolution",
+        "FocalPlaneResolutionUnit", "WhiteBalance", "ShutterSpeedValue", "ApertureValue", "MaxApertureValue",
+        "BrightnessValue", "SubjectDistance", "SubjectDistanceRange", "SubjectArea", "SubjectLocation",
+        "DigitalZoomRatio", "SceneCaptureType", "SceneType", "SensingMethod", "GainControl", "Contrast",
+        "Saturation", "Sharpness", "CustomRendered", "CompositeImage", "SpectralSensitivity", "OECF",
+        "SpatialFrequencyResponse", "CFAPattern", "DeviceSettingDescription", "ExposureBiasValue", "FileSource",
+        "Temperature", "Humidity", "Pressure", "WaterDepth", "Acceleration", "CameraElevationAngle"
+      ]
+    },
+    {
+      "id": "descriptive",
+      "tags": [
+        "Title", "ObjectName", "Headline", "ImageDescription", "Description", "Caption-Abstract", "UserComment",
+        "Comment", "XPTitle", "XPComment", "XPSubject", "XPKeywords", "Subject", "Keywords", "Keyword", "Rating",
+        "RatingPercent", "Label", "Category", "SupplementalCategories", "Instructions", "SpecialInstructions",
+        "PersonInImage", "HierarchicalSubject", "TagsList", "LastKeywordXMP", "LastKeywordIPTC", "CatalogSets",
+        "Event", "Album", "Genre", "Caption", "DisplayName", "Urgency", "Scene", "SubjectCode", "IntellectualGenre",
+        "RegionInfo", "RegionList", "RegionName", "PickLabel", "ColorClass"
+      ]
+    },
+    {
+      "id": "author",
+      "tags": [
+        "Artist", "Creator", "By-line", "By-lineTitle", "Author", "XPAuthor", "Copyright", "Rights",
+        "CopyrightNotice", "Credit", "Source", "UsageTerms", "WebStatement", "Marked", "AuthorsPosition",
+        "CaptionWriter", "Writer-Editor", "CopyrightFlag", "Owner", "CopyrightStatus", "Contact", "Publisher",
+        "Contributor", "Licensor", "CreatorContactInfo", "Director", "Producer"
+      ],
+      "prefixes": ["CreatorAddress", "CreatorCity", "CreatorCountry", "CreatorPostalCode", "CreatorRegion", "CreatorWork"]
+    },
+    {
+      "id": "makernotes",
+      "groups0": ["MakerNotes"]
+    },
+    {
+      "id": "container",
+      "groups0": ["QuickTime", "RIFF", "ID3", "Vorbis", "FLAC", "Matroska", "ASF", "M2TS", "H264"]
+    },
+    {
+      "id": "other",
+      "catchAll": true
+    }
+  ]
+}

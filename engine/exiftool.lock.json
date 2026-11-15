@@ -1,0 +1,14 @@
+{
+  "_comment": "Pinned ExifTool release. Hashes are the official SHA2-256 values from https://exiftool.org/checksums.txt. Update all fields together.",
+  "version": "13.63",
+  "windows": {
+    "file": "exiftool-13.63_64.zip",
+    "url": "https://sourceforge.net/projects/exiftool/files/exiftool-13.63_64.zip/download",
+    "sha256": "7a4bff4b1d6ee15adef882837847f76c0ed23228d294feed285939b6c9b293bd"
+  },
+  "source": {
+    "file": "Image-ExifTool-13.63.tar.gz",
+    "url": "https://sourceforge.net/projects/exiftool/files/Image-ExifTool-13.63.tar.gz/download",
+    "sha256": "c6438851b971886f2eb35426ea5bc8960f34ae4eddeca3198a57af5b0ad49cbd"
+  }
+}
