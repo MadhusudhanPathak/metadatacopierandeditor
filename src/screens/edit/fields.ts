@@ -4,7 +4,7 @@ import type { Field, FileFields, Location } from "../../api";
 import { deviceOffset, utcOffsets } from "../../lib/format";
 import { pickOnMap } from "../../dialogs/map-picker";
 import { S } from "../../strings";
-import { h, icon, tip, toast } from "../../ui";
+import { fillPlace, h, icon, rememberPlace, tip, toast } from "../../ui";
 import { page, render, st } from "./state";
 
 export type TextFieldName = "make" | "model" | "lens" | "title" | "description" | "author" | "copyright";
@@ -193,45 +193,51 @@ function parseCoords(s: string): [number, number] | null {
   return [lat, lon];
 }
 
+/** Location: one coordinates box (type or paste "lat, lon"), optional altitude, and the map picker (D17). */
 export function locationField(): HTMLElement {
   const c = common<Location>((d) => d.fields.location);
   const ch = st.changes.location;
   const cur: Location | null = ch?.op === "set" ? { lat: ch.lat, lon: ch.lon, alt: ch.alt } : ch?.op === "clear" ? null : c.value;
-  const ph = placeholderFor("location", c);
-  const lat = h("input", { type: "number", step: "any", min: "-90", max: "90", placeholder: ph, value: cur ? String(cur.lat) : "", "aria-label": S.loc.lat });
-  const lon = h("input", { type: "number", step: "any", min: "-180", max: "180", placeholder: ph, value: cur ? String(cur.lon) : "", "aria-label": S.loc.lon });
-  const alt = h("input", { type: "number", step: "any", placeholder: "—", value: cur?.alt != null ? String(Math.round(cur.alt)) : "", "aria-label": S.loc.alt });
-  const commit = () => {
-    const la = parseFloat(lat.value);
-    const lo = parseFloat(lon.value);
-    if (Number.isFinite(la) && Number.isFinite(lo)) {
-      const al = parseFloat(alt.value);
-      st.changes.location = { op: "set", lat: la, lon: lo, alt: Number.isFinite(al) ? al : null };
-      render();
-    }
-  };
-  [lat, lon, alt].forEach((i) => (i.onchange = commit));
-  const paste = h("input", {
+  const fmt = (l: Location) => `${+l.lat.toFixed(6)}, ${+l.lon.toFixed(6)}`;
+  const coords = h("input", {
     type: "text",
-    placeholder: S.loc.pasteHint,
-    "aria-label": S.loc.paste,
-    onchange: (e: Event) => {
-      const r = parseCoords((e.target as HTMLInputElement).value);
-      if (!r) {
-        toast(S.loc.badPaste, "warn");
-        return;
-      }
-      st.changes.location = { op: "set", lat: r[0], lon: r[1], alt: null };
-      render();
-    },
+    class: "mono-input",
+    placeholder: ch?.op === "clear" || c.mixed ? placeholderFor("location", c) : S.loc.coordsHint,
+    value: cur ? fmt(cur) : "",
+    "aria-label": S.loc.coords,
+    spellcheck: false,
   });
+  const alt = h("input", { type: "number", step: "any", placeholder: S.loc.altHint, value: cur?.alt != null ? String(Math.round(cur.alt)) : "", "aria-label": S.loc.alt });
+  const commit = () => {
+    const v = coords.value.trim();
+    if (!v) {
+      if (cur) st.changes.location = { op: "clear" };
+      render();
+      return;
+    }
+    const r = parseCoords(v);
+    if (!r) {
+      toast(S.loc.badPaste, "warn");
+      return;
+    }
+    const al = parseFloat(alt.value);
+    st.changes.location = { op: "set", lat: r[0], lon: r[1], alt: Number.isFinite(al) ? al : null };
+    render();
+  };
+  coords.onchange = commit;
+  alt.onchange = () => {
+    if (!cur && !coords.value.trim()) return;
+    commit();
+  };
   const mapBtn = h(
     "button",
     {
       class: "btn",
+      type: "button",
       onclick: async () => {
         const r = await pickOnMap(cur);
         if (r) {
+          if (r.label) rememberPlace(r.lat, r.lon, r.label);
           st.changes.location = { op: "set", lat: r.lat, lon: r.lon, alt: cur?.alt ?? null };
           render();
         }
@@ -240,19 +246,20 @@ export function locationField(): HTMLElement {
     icon("pin"),
     S.loc.map,
   );
+  const place = cur ? fillPlace(h("div", { class: "placeline" }), cur.lat, cur.lon) : null;
   return fieldBox(
     "location",
     h(
       "div",
-      { class: "col" },
+      { class: "col", style: "gap:6px" },
       h(
         "div",
-        { class: "row", style: "align-items:flex-end" },
-        h("label", { class: "field grow" }, h("span", { class: "small muted" }, S.loc.lat), lat),
-        h("label", { class: "field grow" }, h("span", { class: "small muted" }, S.loc.lon), lon),
-        h("label", { class: "field", style: "width:150px" }, h("span", { class: "small muted" }, S.loc.alt), alt),
+        { class: "locrow" },
+        h("div", { class: "grow" }, coords),
+        h("label", { class: "altbox", "data-tip": S.loc.alt }, alt, h("span", { class: "unit" }, "m")),
+        mapBtn,
       ),
-      h("div", { class: "row" }, h("label", { class: "field grow" }, h("span", { class: "small muted" }, S.loc.paste), paste), h("div", { style: "align-self:flex-end" }, mapBtn)),
+      place,
     ),
     { full: true },
   );

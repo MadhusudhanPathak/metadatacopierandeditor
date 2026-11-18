@@ -3,7 +3,7 @@
 Compressed or converted your photos and videos, and lost the dates, places and camera details?
 This app puts them back, offline, with a friendly preview and a real Undo.
 
-- **Copy Metadata:** pairs each original (Source) wiSth its compressed or converted copy (Converted), copies *all* meaningful metadata across, then swaps the files: the Converted file takes the original's name and folder, and the original is kept next to it as `name_original`.
+- **Copy Metadata:** pairs each original (Source) with its compressed or converted copy (Converted), copies *all* meaningful metadata across, then swaps the files: the Converted file takes the original's name and folder, and the original is kept next to it as `name_original`.
 - **Edit Metadata:** fix the date (set it, or shift a whole batch when a camera clock was wrong), add a location (type, paste, or search and pick on a map), title, description, keywords, rating, author and copyright, for one file or many at once. Only the fields you touch are written, and each edited file keeps its untouched version next to it as `name_original`.
 
 Powered by [ExifTool](https://exiftool.org/), so it works with practically every photo, video and RAW format.
@@ -19,7 +19,7 @@ Notes:
 - It uses Microsoft Edge **WebView2**, which is built into Windows 11 and up-to-date Windows 10. If it's missing, the app tells you and links to Microsoft's free installer.
 - On first launch the bundled metadata engine is unpacked to `%LOCALAPPDATA%\Metadata Copier and Editor\` (about 28 MB). Delete that folder to remove every trace of the app.
 
-Android is planned next; see [DECISIONS.md](DECISIONS.md#android-status).
+Android is planned next.
 
 ## Usage
 
@@ -110,7 +110,7 @@ A [Tauri v2](https://tauri.app/) app: a Rust core and a small framework-free Typ
 | Engine | `src-tauri/src/engine/` | The bundled ExifTool process and its wire protocol. |
 | Platform | `src-tauri/src/platform/` | File operations that never overwrite, shell thumbnails, the WebView2 check. |
 
-Requirements are in [PROJECT_SPEC.md](PROJECT_SPEC.md), design decisions and deviations from the spec in [DECISIONS.md](DECISIONS.md), and contributor notes in [AGENTS.md](AGENTS.md).
+Contributor notes, design decisions and the Android plan are in [AGENTS.md](AGENTS.md).
 
 ## Licence
 

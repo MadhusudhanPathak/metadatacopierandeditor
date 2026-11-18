@@ -2,7 +2,7 @@
 //! offline place search.
 
 use super::{R, app_state, blocking};
-use crate::geo::Place;
+use crate::geo::{Nearby, Place};
 use crate::metadata::tags::{Kind, kind_of};
 use crate::planning::pairing::{self, PairMode, PairingResult};
 use crate::platform::thumbs;
@@ -14,7 +14,7 @@ use tauri::AppHandle;
 const THUMB_MIN: u32 = 32;
 const THUMB_MAX: u32 = 256;
 /// Places returned per search.
-const PLACE_RESULTS: usize = 12;
+const PLACE_RESULTS: usize = 40;
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -86,4 +86,11 @@ pub async fn thumbnail(path: String, size: u32) -> Option<String> {
 pub async fn search_places(app: AppHandle, query: String) -> R<Vec<Place>> {
     let s = app_state(&app);
     blocking(move || Ok(s.places()?.search(&query, PLACE_RESULTS))).await
+}
+
+/// The nearest town or city to a point, offline (T21), to name a dropped pin or a file's GPS.
+#[tauri::command]
+pub async fn nearest_place(app: AppHandle, lat: f64, lon: f64) -> R<Option<Nearby>> {
+    let s = app_state(&app);
+    blocking(move || Ok(s.places()?.nearest(lat, lon))).await
 }

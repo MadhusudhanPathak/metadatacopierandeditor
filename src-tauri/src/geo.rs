@@ -208,22 +208,55 @@ impl Db {
             hits.push((rank, e));
         }
         hits.sort_by(|a, b| a.0.cmp(&b.0).then(b.1.population.cmp(&a.1.population)));
-        hits.into_iter()
-            .take(limit)
-            .map(|(_, e)| {
-                let (cc, cn) = self.countries.get(e.country).map(|c| (c.0.clone(), c.1.clone())).unwrap_or_default();
-                Place {
-                    name: e.name.clone(),
-                    region: self.regions.get(e.region).map(|r| r.0.clone()).unwrap_or_default(),
-                    country: cn,
-                    country_code: cc,
-                    lat: (e.lat * 10_000.0).round() / 10_000.0,
-                    lon: (e.lon * 10_000.0).round() / 10_000.0,
-                    population: e.population,
-                }
-            })
-            .collect()
+        hits.into_iter().take(limit).map(|(_, e)| self.place(e)).collect()
     }
+
+    fn place(&self, e: &Entry) -> Place {
+        let (cc, cn) = self.countries.get(e.country).map(|c| (c.0.clone(), c.1.clone())).unwrap_or_default();
+        Place {
+            name: e.name.clone(),
+            region: self.regions.get(e.region).map(|r| r.0.clone()).unwrap_or_default(),
+            country: cn,
+            country_code: cc,
+            lat: (e.lat * 10_000.0).round() / 10_000.0,
+            lon: (e.lon * 10_000.0).round() / 10_000.0,
+            population: e.population,
+        }
+    }
+
+    /// The closest town or city to a point (T21), with its great-circle distance in km.
+    /// `None` for invalid coordinates or an empty database.
+    pub fn nearest(&self, lat: f64, lon: f64) -> Option<Nearby> {
+        if !lat.is_finite() || !lon.is_finite() || lat.abs() > 90.0 || lon.abs() > 180.0 {
+            return None;
+        }
+        let (la, lo) = (lat.to_radians(), lon.to_radians());
+        let cos_la = la.cos();
+        // Cheap equirectangular distance to rank; exact haversine for the winner only.
+        let best = self.entries.iter().min_by(|a, b| {
+            let d = |e: &Entry| {
+                let mut dlon = (e.lon.to_radians() - lo).abs();
+                if dlon > std::f64::consts::PI {
+                    dlon = 2.0 * std::f64::consts::PI - dlon;
+                }
+                let x = dlon * ((e.lat.to_radians() + la) / 2.0).cos();
+                let y = e.lat.to_radians() - la;
+                x * x + y * y
+            };
+            d(a).total_cmp(&d(b))
+        })?;
+        let (bl, bo) = (best.lat.to_radians(), best.lon.to_radians());
+        let h = ((bl - la) / 2.0).sin().powi(2) + cos_la * bl.cos() * ((bo - lo) / 2.0).sin().powi(2);
+        let km = 2.0 * 6371.0 * h.sqrt().min(1.0).asin();
+        Some(Nearby { place: self.place(best), km: (km * 10.0).round() / 10.0 })
+    }
+}
+
+#[derive(Serialize, Clone, Debug, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Nearby {
+    pub place: Place,
+    pub km: f64,
 }
 
 #[cfg(test)]
@@ -283,5 +316,18 @@ mod tests {
         assert_eq!(db.search("paris, tx", 5).len(), 0);
         assert_eq!(db.search("paris, texas", 5).len(), 1);
         assert!(db.search("  ", 5).is_empty());
+    }
+
+    #[test]
+    fn nearest_town_and_distance() {
+        let db = sample();
+        let n = db.nearest(48.8584, 2.2945).unwrap(); // Eiffel Tower
+        assert_eq!((n.place.name.as_str(), n.place.country.as_str()), ("Paris", "France"));
+        assert!(n.km > 3.0 && n.km < 5.0, "{}", n.km);
+        assert_eq!(db.nearest(-23.0, -46.0).unwrap().place.name, "São Paulo");
+        // Distance wraps across the antimeridian (Texas is 84.6° away that way, not 275.4°).
+        assert_eq!(db.nearest(45.5, 179.9).unwrap().place.country_code, "US");
+        assert!(db.nearest(f64::NAN, 0.0).is_none());
+        assert!(db.nearest(91.0, 0.0).is_none());
     }
 }

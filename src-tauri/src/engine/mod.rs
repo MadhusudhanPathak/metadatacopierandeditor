@@ -42,7 +42,7 @@ impl Launch {
     }
 
     /// Launch settings for an engine unpacked into `dir`. Android: perl from the app's native
-    /// library dir with ExifTool's `lib/` extracted next to the script (see DECISIONS.md).
+    /// library dir with ExifTool's `lib/` extracted next to the script (see AGENTS.md, "Android plan").
     #[cfg(not(windows))]
     pub fn for_dir(dir: &Path) -> Self {
         Self {

@@ -14,6 +14,7 @@ import type {
   PairingResult,
   PairMode,
   PairReq,
+  Nearby,
   Place,
   Progress,
   RecoveryAction,
@@ -45,6 +46,7 @@ export const api = {
   getSettings: () => invoke<Settings>("get_settings"),
   setSettings: (settings: Settings) => invoke<Settings>("set_settings", { settings }),
   searchPlaces: (query: string) => invoke<Place[]>("search_places", { query }),
+  nearestPlace: (lat: number, lon: number) => invoke<Nearby | null>("nearest_place", { lat, lon }),
 };
 
 /** Per-item progress of the running operation. */

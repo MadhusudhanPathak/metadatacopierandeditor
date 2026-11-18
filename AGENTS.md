@@ -1,8 +1,8 @@
 # AGENTS.md — context for coding agents
 
-Read this first, then [PROJECT_SPEC.md](PROJECT_SPEC.md) (the requirements) and [DECISIONS.md](DECISIONS.md) (decisions that refine or override the spec — **DECISIONS.md wins on conflict**). Keep this file current: when you change architecture, commands, state or gotchas, update the relevant section here in the same change.
+Read this first. It is the single source of project context: the original `PROJECT_SPEC.md` and `DECISIONS.md` were retired by the owner on 2026-11-18, and the decisions still cited in code (`D6`, `T9`, …) are summarised under [Decision IDs](#decision-ids). Code comments citing "spec N.N" refer to that retired spec; the behaviour they describe is what the code and this file say. Keep this file current: when you change architecture, commands, state or gotchas, update the relevant section here in the same change.
 
-*Last updated: 2026-11-16.*
+*Last updated: 2026-11-18.*
 
 ## What this is
 
@@ -18,7 +18,7 @@ The engine is the bundled ExifTool (Perl), driven as one persistent process. Lic
 ## Rules from the product owner (do not break)
 
 - **Never `git commit` or `git push`.** The owner commits and pushes. Leave changes in the working tree.
-- Product behaviour is the owner's call: ask about anything user-visible that the spec and DECISIONS.md don't settle. Technical choices are delegated: make them and record them in DECISIONS.md (next free numbers: **D17**, **T21**).
+- Product behaviour is the owner's call: ask about anything user-visible that this file doesn't settle. Technical choices are delegated: make them and add a one-line entry to [Decision IDs](#decision-ids) (next free numbers: **D18**, **T22**).
 - Windows first; Android next (D14). App is for the general public, not one person.
 - Lightweight: no heavy frameworks, no icon packs, no analytics or telemetry. Network: OSM map tiles, plus Nominatim only when the user presses "Search online" (D16). Nothing else.
 - No hidden files or folders, no extra copies: just `name_original` + the updated file (D15).
@@ -29,17 +29,17 @@ The engine is the bundled ExifTool (Perl), driven as one persistent process. Lic
 | Area | State |
 | --- | --- |
 | Windows app (all spec screens & flows) | Implemented. Release exe ~15 MB (`src-tauri/target/release/MetadataCopierAndEditor.exe`). |
-| Rust unit tests | 56 pass (`npm test`). |
+| Rust unit tests | 57 pass (`npm test`). |
 | End-to-end tests with real ExifTool | 14 pass (`npm run test:e2e`). |
 | Lint/format | `cargo clippy --all-targets` clean, `cargo fmt --check` clean, `npm run typecheck` clean. |
-| UI click-through by a human/agent | **Not yet done.** No screen has been verified interactively. Expect UI bugs. |
+| UI click-through | Done by the owner on their desktop (2026-11-18): works, including the redesigned map picker / location field and Edit Review (D17) in v0.2.0. |
 | Network check (tiles + opt-in Nominatim only) | Not done (needs a proxy or packet capture). |
 | WebView2-missing dialog | Written (`platform/webview.rs`), untested (this PC has WebView2). |
-| Android | **Not started.** See "Android plan" below. |
-| Git | One scaffold commit (`0801e6f`) by an agent before the no-commit rule, plus the owner's `initial commit`; everything since is uncommitted. Template leftovers (`src/assets/*.svg`, Store/macOS icons) are deleted in the working tree. |
+| Android | **Not started; next up.** See "Next steps" item 1. |
+| Git | Owner commits and pushes (latest: `574df85 Readme`). One early scaffold commit (`0801e6f`) was made by an agent before the no-commit rule. |
 | Working tree | Clean for push: no `node_modules`, `target`, `dist`, `engine/cache` or fixtures are tracked. Run `npm ci && npm run fetch-engine` before building; `npm run fetch-engine -- all && npm run fixtures` before e2e tests. |
-| Release v0.1.0 | `releases/MetadataCopierAndEditor-v0.1.0-windows-x64.exe` + `.sha256` (gitignored, uploaded to GitHub Releases by the owner) and `releases/RELEASE_NOTES.md` (tracked). |
-| App icon | Still Tauri's default icon set in `src-tauri/icons/`. Replace with `npm run tauri icon <1024px png>` when the owner provides artwork. |
+| Release v0.2.0 (current) | `releases/MetadataCopierAndEditor-v0.2.0-windows-x64.exe` + `.sha256` (gitignored; the owner uploads them to GitHub Releases) and `releases/RELEASE_NOTES.md` (tracked, v0.2.0 notes). v0.1.0 binaries were removed locally; they live on GitHub Releases. Version is in `package.json`, `package-lock.json`, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock` and `src-tauri/tauri.conf.json`; bump all five. |
+| App icon | Owner artwork since 2026-11-18. Master: `src-tauri/icons/app-icon.png` (1024 px, transparent), made from the owner's 920 px `Icon.png` (the owner's originals `Icon.png` and `Icon.ico` stay in the repo root, tracked): white background made transparent, two stray marks below the tile removed, centred on a square. `src-tauri/icons/` keeps only the master + the 5 files `tauri.conf.json` lists. Regenerate with `npm run tauri icon src-tauri/icons/app-icon.png` (for Android: after `tauri android init`, so it also writes the launcher icons), then delete the extra platform files it creates. |
 
 ## Components
 
@@ -50,14 +50,14 @@ Each component has one job and only depends on the components listed after it (T
 | Component | Files | Responsibility | Boundaries / interaction |
 | --- | --- | --- | --- |
 | Entry | `main.rs`, `lib.rs` | Starts Tauri, registers commands, startup (mark interrupted ops, start the engine), engine shutdown on exit. | Only wiring; no logic. |
-| `commands/` | `system` (engine status, About), `files` (expand paths, Converted suggestion, pairing, thumbnails, place search), `copy`, `edit`, `history` (History, Undo, recovery, `OpView`), `settings`, `runner` (background Apply with `op-progress`/`op-finished` events; foreground Undo/recovery) | The IPC surface the UI calls. Converts requests to domain calls, runs slow work on blocking threads, returns plain-language `String` errors. | Thin: calls `planning`, `ops`, `state`. Mirrored by `src/api/`. |
+| `commands/` | `system` (engine status, About), `files` (expand paths, Converted suggestion, pairing, thumbnails, place search, nearest place), `copy`, `edit`, `history` (History, Undo, recovery, `OpView`), `settings`, `runner` (background Apply with `op-progress`/`op-finished` events; foreground Undo/recovery) | The IPC surface the UI calls. Converts requests to domain calls, runs slow work on blocking threads, returns plain-language `String` errors. | Thin: calls `planning`, `ops`, `state`. Mirrored by `src/api/`. |
 | `state.rs` | `AppState`, `BusyGuard` | Engine lifecycle (background unpack + start, waiters), metadata cache, journal, the latest Copy/Edit plan, place DB, cancel flag, the single-operation lock (RAII). | Owned by Tauri; commands get it via `app_state()`. |
 | `ops/` | `journal` (Op/Item model, JSON + fsync'd log, `mark_interrupted`), `items` (plans → journal items, temp names), `executor` (run, Undo, recover, step machine), `rollback` (`rollback_item`, `undo_blocker`), `verify` (temp-file checks, engine error wording) | Applying plans safely: journal first, temp write → verify → swap → dates → drop old Converted copy; reverse from any step. | Uses `engine` to write, `platform::fsops` to move. Never re-plans. |
 | `planning/` | `pairing` (4 modes, D3 kind-first, ignores app files), `copy` (requests, Preview assembly, pre-flight), `copy_pair` (per-pair clean-slate args, counts, diff, expectations — pure), `guards` (orientation T8, mismatch hints), `edit` (field reading, Review, `plan_file` — pure), `preflight` (read-only/locked/folder/space checks), `mod.rs` (`Issue`, `DiffRow`, `PairState`, `diff_rows`) | Building the Preview/Review and the exact ExifTool arguments. | Reads files and metadata only; **must not change files**. |
 | `metadata/` | `tags` (`TagMap`, `Kind`, `FormatClass`), `categories` + `categories.json` (Copy checklist, spec 5.1), `fields` (curated fields: extract, write targets per format), `datetime` (timezone resolution, photo↔video dates, `Shift`), `cache` (path+size+mtime cache, reads with `-api Geolocation=1`) | Interpreting metadata. Device timezone is injected so tests are machine-independent. | Pure except `cache` (calls `engine`). |
 | `engine/` | `mod.rs` (`Engine`, `Launch::for_dir`), `protocol.rs` (argument encoding, `-executeN` framing, stderr parsing), `extract.rs` (first-launch unpack + per-file SHA-256 verify) | Owning the one ExifTool process; restart once on death. | Knows nothing about plans or journals. |
 | `platform/` | `fsops` (file times, never-overwriting moves, `\\?\` paths, `path_key`/`same_path`, free space, locks, describe I/O errors), `thumbs` (Windows shell thumbnails → PNG data URL), `webview` (WebView2 check) | OS services; all `cfg(windows)` code lives here. | Leaf layer. |
-| Other | `geo.rs` (offline place search over `Geolocation.dat`, T17), `settings.rs` (settings JSON, atomic save) | | |
+| Other | `geo.rs` (offline place search and nearest town over `Geolocation.dat`, T17, T21), `settings.rs` (settings JSON, atomic save) | | |
 | Build | `build.rs` | Verifies the pinned ExifTool zip hash, strips `Lang/`, `.pod`, `TAP/`, `Test*/`, deflate-packs it into `OUT_DIR/engine.bin`. | Fails without `npm run fetch-engine`. |
 | Tests | `tests/e2e.rs` | End-to-end with the real ExifTool; fixtures in `tests/fixtures` (gitignored). | Skips with a note if fixtures are missing. |
 
@@ -68,17 +68,15 @@ Each component has one job and only depends on the components listed after it (T
 | Shell | `main.ts`, `router.ts` | Top bar, engine status chip, screen registration and `go()`, leave guard while a batch runs, startup recovery check. Screens import `router.ts`, never `main.ts`. |
 | API | `api/index.ts`, `api/types.ts` | Typed `invoke` wrappers, event listeners, `errText`. Types mirror Rust serde (camelCase); keep in sync. |
 | Strings | `strings.ts` | **All** user-facing text (spec 9). Never hard-code UI strings elsewhere. |
-| UI toolkit | `ui/` (`dom` h/add/clear, `icons`, `tooltip`, `overlay` toasts/modals, `thumbs`, `dropzone`, `links`, `widgets` stepper/note/switch/diff table), `ui/index.ts` re-exports | Reusable view pieces; no screen state. |
+| UI toolkit | `ui/` (`dom` h/add/clear, `icons`, `tooltip`, `overlay` toasts/modals, `thumbs`, `place` (place labels for coordinates: picked name or offline "km from …"), `dropzone`, `links`, `widgets` stepper/note/switch/diff table), `ui/index.ts` re-exports | Reusable view pieces; no screen state. |
 | Helpers | `lib/format.ts`, `lib/paths.ts` | Pure formatting (bytes, durations, UTC offsets) and path helpers. |
 | Screens | `screens/home`, `history`, `settings`, `about`, `run` (Run + Done, shared), `copy/` (`state`, `pick`, `pair`, `preview`, `index`), `edit/` (`state`, `pick`, `fields`, `editor`, `review`, `index`) | One folder per multi-step flow: `state.ts` holds the flow's state and `render()`, step files import only `state.ts`. |
-| Dialogs | `dialogs/map-picker.ts` (Leaflet, lazy; offline + online place search), `dialogs/recovery.ts` | Modal flows used by screens or startup. |
+| Dialogs | `dialogs/map-picker.ts` (Leaflet, lazy; results list beside the map, offline as-you-type + explicit online search, D17), `dialogs/recovery.ts` | Modal flows used by screens or startup. |
 | Styles | `styles.css` | Theme tokens and all styling. |
 
 ### Other files
 
 ```text
-PROJECT_SPEC.md            requirements (spec sections are cited in code comments, e.g. "spec 5.4")
-DECISIONS.md               D1–D16 product decisions, T1–T20 technical decisions, Android status
 README.md                  user-facing; THIRD_PARTY_NOTICES.md is shown in the About screen
 engine/exiftool.lock.json  pinned ExifTool version + official SHA-256 (Windows zip + source tar.gz)
 engine/cache/              downloads (gitignored)
@@ -139,11 +137,48 @@ cd src-tauri && cargo fmt && cargo clippy --all-targets   # keep both clean
 - **Never mark the temp file hidden.** Windows keeps the hidden attribute through a rename, so the updated file ended up hidden (T18). The e2e tests assert visibility.
 - Timezone from GPS uses ExifTool's own offline geolocation (`GeolocationTimeZone`) + `chrono-tz`, not a separate boundary map (T6).
 - Tauri command functions must be registered by their full module path in `lib.rs` (`commands::copy::plan_copy`); re-exports don't carry the generated `__cmd__` items.
+- **Changing `src-tauri/icons/` alone does not rebuild the exe icon**: the Windows resource is cached in `OUT_DIR`. `touch src-tauri/tauri.conf.json` before building, then check the exe (2026-11-18: the first build after the icon swap still had the old icon).
+
+## Decision IDs
+
+Short meanings of the IDs cited in code comments. **D** = product (owner's call), **T** = technical (delegated). Missing numbers were superseded or never cited.
+
+| ID | Decision |
+| --- | --- |
+| D1 | Public app; prioritise iPhone HEIC/MOV, Android JPEG/MP4, common RAW (CR2/CR3/NEF/ARW/DNG). |
+| D2 | No fuzzy name matching (`IMG_001_compressed.jpg`); the Pair step explains the naming rule instead. |
+| D3 | Pair within media kind first (photo↔photo, video↔video), so Live Photos pair cleanly. |
+| D4 | The app only touches metadata; it never re-encodes. |
+| D5 | Scans and pairing ignore the app's own files (`*_original*`, temps, legacy `.mce-undo/`). |
+| D6 | The Source is ground truth: clear the Converted file's descriptive metadata, then copy the Source's. Structural tags are never cleared or copied. |
+| D7 | An unticked Copy category is left exactly as it is on the Converted file. |
+| D8 | Timezone order: explicit offset → GPS-derived zone → device zone (flagged "assumed"). |
+| D10 | Date taken: "Set to" and "Shift by" (± days/hours/minutes), per file relative to its own value. |
+| D11 | Edit keeps the untouched file as `name_original` (now always, see D15). |
+| D12 | Licence GPL-3.0-or-later. D13: name "Metadata Copier and Editor", codename MCE. D14: Windows first, then Android. |
+| D15 | No hidden Undo Cache or backup option: a folder holds only `name_original` + the updated file, both visible. Undo works from those. |
+| D16 | Network: OSM tiles while the map is open; Nominatim only when the user presses "Search online". |
+| D17 | Location UI (2026-11-18): one compact coordinates box + altitude + map button, with the place name shown under it. Map picker: side-by-side results list and map, offline results as you type, each result shows its name, type and full address; online search stays an explicit button. Edit Review: a "what will be written" summary, then one compact before → after block per file; unchanged files collapse into one line. |
+| T1–T3 | Tauri v2 (Rust + vanilla TS); MSVC toolchain; thin vertical slice first. |
+| T4 | ExifTool is embedded in the exe and unpacked on first launch with per-file SHA-256 checks. |
+| T5 | One persistent ExifTool process, `-executeN` framing, stderr parsed per command. |
+| T6 | GPS → timezone via ExifTool's own geolocation + `chrono-tz` (no separate boundary map). |
+| T7 | Clean-slate copy as one ExifTool command (`-all=`, restore structural + unticked from `@`, copy Source). |
+| T8 | Orientation guard: copy Orientation only when it can't rotate the picture twice. |
+| T9 | Temp file is verified (opens, same FileType, key tags read back) before any swap. |
+| T10 | Journal: full op JSON first, then an fsync'd step log per op. |
+| T13 | Manual pairing uses pointer events because Tauri's OS file drop disables HTML5 drag-and-drop. |
+| T14 | Read-only and locked files are reported in pre-flight, never forced. |
+| T16 | Writing into a file with no EXIF adds ExifTool's 4 required IFD0 tags; accepted. |
+| T17 | Offline place search reads ExifTool's `Geolocation.dat` directly (`geo.rs`). |
+| T18 | Never mark the temp file hidden (the attribute survives the rename). |
+| T19 | Component layering: UI → commands → planning/ops → metadata → engine/platform. |
+| T20 | No panics on input (release uses `panic = "abort"`). |
+| T21 | "Near …" place names are an offline nearest-city lookup over the same `Geolocation.dat` (`geo::Db::nearest`, `nearest_place` command); no network, no reverse geocoding online. |
 
 ## Next steps (suggested order)
 
-1. **Interactive pass over every screen** (`npm run tauri dev`) on a scratch folder: pick/drop, all 4 pairing modes, manual pairing, Preview toggles and conflicts, Run/cancel, Done/Undo, Edit single and bulk, map picker, History, Settings, recovery prompt (kill the app mid-batch). Fix what breaks.
+1. **Android plan** (next up): perl-cross + NDK static Perl for `aarch64-linux-android` with `-Wl,-z,max-page-size=16384`, shipped as `jniLibs/arm64-v8a/libperl.so` (`extractNativeLibs=true`); ExifTool `lib/` as assets extracted to `filesDir`; Kotlin Tauri plugin for All Files Access onboarding, `nativeLibraryDir`, media rescan (add a per-item callback to `ops::executor::Ctx`, called after each finished or undone item), `loadThumbnail`. `engine::Launch::for_dir` already has the non-Windows branch. Needs a Linux host (WSL or CI). Owner tests on their own arm64 phone.
 2. Network verification (spec 13 as widened by D16): proxy/packet capture; only `tile.openstreetmap.org` while the map is open and `nominatim.openstreetmap.org` after pressing "Search online"; nothing otherwise.
 3. More e2e coverage from spec 13: cross-volume swap, cancel mid-batch, forced crash + `recover`, DNG/CR2 → JPEG, M4A, orientation-guarded real files, low-disk.
-4. **Android** (see DECISIONS.md "Android status"): perl-cross + NDK static Perl for `aarch64-linux-android` with `-Wl,-z,max-page-size=16384`, shipped as `jniLibs/arm64-v8a/libperl.so` (`extractNativeLibs=true`); ExifTool `lib/` as assets extracted to `filesDir`; Kotlin Tauri plugin for All Files Access onboarding, `nativeLibraryDir`, media rescan (add a per-item callback to `ops::executor::Ctx`, called after each finished or undone item), `loadThumbnail`. `engine::Launch::for_dir` already has the non-Windows branch. Needs a Linux host (WSL or CI). Owner tests on their own arm64 phone.
-5. Release notes for future GitHub releases (platform differences: Android can't set created time; Windows needs WebView2; unsigned exe → SmartScreen).
+4. Release notes: `releases/RELEASE_NOTES.md` holds the latest release's notes ("What's new" + the standing sections). For the Android release add its platform differences (can't set created time) next to the Windows ones (WebView2; unsigned exe → SmartScreen).

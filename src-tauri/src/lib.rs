@@ -50,6 +50,7 @@ pub fn run() {
             commands::files::pair_files,
             commands::files::thumbnail,
             commands::files::search_places,
+            commands::files::nearest_place,
             commands::copy::plan_copy,
             commands::copy::run_copy,
             commands::copy::cancel_run,

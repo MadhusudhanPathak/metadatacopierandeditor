@@ -1,11 +1,20 @@
-# Metadata Copier and Editor v0.1.0 — first release (Windows)
+# Metadata Copier and Editor v0.2.0 (Windows)
 
 Bring back the dates, places and camera details that your photos and videos lost when you compressed or converted them, or edit them by hand. Everything runs on your PC.
 
+## What's new in 0.2.0
+
+- **A proper app icon.**
+- **Faster, clearer place search on the map.** Results now sit in a list next to the map and appear as you type, with each place's type and full address, so it's easy to tell "Paris, France" from "Paris, Texas". **Search online** finds streets, addresses and landmarks, with up to 20 results, each with its full address. Dropped pins are named too ("3.9 km from Paris, France"), worked out offline.
+- **A tidier Location field.** One box for coordinates (type them or paste them), a small altitude box and **Pick on map**, with the place name shown underneath.
+- **A more precise Review before saving edits.** When editing several files, a summary shows each change once, and on how many files it applies. Each file then gets a compact before → after list, locations show their place names, and files with nothing to change are grouped into one line.
+
 ## Download
 
-- **`MetadataCopierAndEditor-v0.1.0-windows-x64.exe`** (15 MB): a single portable app for Windows 10/11 (64-bit). There's no installer and it doesn't need admin rights. Just run it.
+- **`MetadataCopierAndEditor-v0.2.0-windows-x64.exe`** (15 MB): a single portable app for Windows 10/11 (64-bit). There's no installer and it doesn't need admin rights. Just run it.
 - `….exe.sha256` lets you check the download (optional).
+
+Upgrading from 0.1.0: just replace the old exe. Your History and settings are kept.
 
 ## What it does
 
@@ -23,10 +32,10 @@ Works with practically every photo, video and RAW format, thanks to the bundled 
 - Keep the original file names when converting (for example `IMG_001.HEIC` → `IMG_001.jpg`) so files pair up automatically.
 - Some formats can't hold metadata (MP3, WAV, AVI, MKV, BMP). The Preview lists them and skips them.
 - Undo restores your originals exactly. Converted files go back to their own folder and name, keeping the copied metadata.
-- **Privacy:** no accounts, analytics or update checks. Only the optional map goes online: it loads map tiles from OpenStreetMap, and its **Search online** button sends your search text to OpenStreetMap. Searching towns and cities works offline.
+- **Privacy:** no accounts, analytics or update checks. Only the optional map goes online: it loads map tiles from OpenStreetMap, and its **Search online** button sends your search text to OpenStreetMap. Searching towns and cities, and naming dropped pins, works offline.
 
 ## Platform notes
 
-- **Android** is planned. When it arrives, it won't be able to change a file's "created" date, only "modified" (an Android limitation).
+- **Android** is next. When it arrives, it won't be able to change a file's "created" date, only "modified" (an Android limitation).
 
 Licence: GPL-3.0-or-later. Third-party licences are in the app's About screen and in `THIRD_PARTY_NOTICES.md`.

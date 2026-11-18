@@ -236,6 +236,11 @@ export interface Place {
   lon: number;
   population: number;
 }
+/** Nearest town or city to a point (offline), with its distance in km. */
+export interface Nearby {
+  place: Place;
+  km: number;
+}
 
 export interface EngineStatus {
   ready: boolean;

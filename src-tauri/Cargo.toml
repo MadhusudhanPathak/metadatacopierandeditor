@@ -1,6 +1,6 @@
 [package]
 name = "mce"
-version = "0.1.0"
+version = "0.2.0"
 description = "Copy and edit photo and video metadata, offline."
 authors = ["Metadata Copier and Editor contributors"]
 license = "GPL-3.0-or-later"
